@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Recommendation</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('/static/xyz.webp');
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Container for the form */
+        .container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Shadow effect */
+            color: #fff; /* Text color */
+        }
+
+
+        h1 {
+            text-align: center;
+            color: hsl(0, 53%, 97%);
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Form Inputs */
+        label {
+            font-size: 26px;
+            color: hsl(0, 17%, 93%);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Result Section */
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7e9;
+            border-left: 4px solid #28a745;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            display: none;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Product Rating Prediction</h1>
+    <form id="prediction-form">
+        <label for="product">Enter Product Name:</label>
+        <input type="text" id="product" placeholder="e.g. boat cable" required>
+        <button type="submit">Get Prediction</button>
+    </form>
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+    // Function to handle the form submission
+    document.getElementById('prediction-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Clear previous results
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'none';
+        resultDiv.classList.remove('error');
+
+        const productName = document.getElementById('product').value.trim();
+
+        if (!productName) {
+            alert('Please enter a product name.');
+            return;
+        }
+
+        // Sending request to the backend API
+        fetch('http://127.0.0.1:5000/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ key_product_name: productName })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.prediction) {
+                resultDiv.style.display = 'block';
+                resultDiv.classList.remove('error');
+                resultDiv.textContent = `Predicted Rating: ${data.prediction}`;
+            } else if (data.error) {
+                resultDiv.style.display = 'block';
+                resultDiv.classList.add('error');
+                resultDiv.textContent = `Error: ${data.error}`;
+            }
+        })
+        .catch(error => {
+            resultDiv.style.display = 'block';
+            resultDiv.classList.add('error');
+            resultDiv.textContent = `An error occurred: ${error}`;
+        });
+    });
+</script>
+
+</body>
+</html>
