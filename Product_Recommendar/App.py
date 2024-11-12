@@ -19,7 +19,7 @@ product_name_to_index = dict(zip(name_to_index_df['product_name'], name_to_index
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory('https://my-recommender-epil.vercel.app/')
 
 @app.route('/predict', methods=['POST'])
 def predict():
